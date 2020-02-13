@@ -1,0 +1,13 @@
+
+/* 
+.screen-container {
+    display: flex;
+    flex-direction: row;
+
+
+} */
+
+.body-container { 
+    display: flex;
+    flex-direction: row;
+}
