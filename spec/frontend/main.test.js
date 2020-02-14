@@ -6,6 +6,6 @@ const js = fs.readFileSync(path.resolve(__dirname, '../../public/js/utils.js'), 
 eval(js);
 
 
-test("front end code should be testable", () => {
-  expect(sum(1,2)).toBe(3);
-});
+// test("front end code should be testable", () => {
+//   expect(sum(1,2)).toBe(3);
+// });

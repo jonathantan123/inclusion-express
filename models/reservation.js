@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     static async createNew(obj){
+      console.log(obj)
       let nums = obj.date.split("-")
       let date1 = new Date(parseInt(nums[0]), parseInt(nums[1])-1, parseInt(nums[2]), parseInt(obj.slot[0]) + 12, obj.slot.slice(2,4))
       let res = 

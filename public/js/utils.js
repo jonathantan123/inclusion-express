@@ -19,7 +19,6 @@ function getDates() {
       avail[time] -= 1
       
       if(avail[half]) { 
-          
           avail[half] -= 1
       }
 
