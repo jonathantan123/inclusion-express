@@ -40,11 +40,13 @@ document.addEventListener("DOMContentLoaded", ()=>{
     let submit = document.createElement("input")
     submit.type = "submit"
     submit.dataset.id = "submit"
-    formContainer.placeholder = "name"
+    input.placeholder = "name"
     formContainer.style.display = "none"
     formContainer.appendChild(input)
     formContainer.appendChild(submit)
     node.appendChild(formContainer)
+    formContainer.addEventListener("submit", formHandler)
+
  }
 
 
@@ -52,6 +54,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
   function displayExisting() {
       let container = document.getElementById("existing-container")  
+      container.innerHTML = ""
       let existingRes = allRes.filter((res) => res.slot.includes(chosenDate))
 
       existingRes.forEach((res) => {   
@@ -67,8 +70,12 @@ document.addEventListener("DOMContentLoaded", ()=>{
   
   function renderTimeSlots() { 
       
+    let resContainer = document.getElementById("reservations-container")
+    resContainer.innerHTML = ""
+
+      
     Object.keys(avail).forEach((slot) => { 
-        let resContainer = document.getElementById("reservations-container")
+        
         let slotContainer = document.createElement("div")
         let timeSlot = document.createElement("p")
 
@@ -80,8 +87,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
                 button.innerText = "Reserve"
                 button.id = slot
                 slotContainer.appendChild(button)
+                button.addEventListener("click", clickHandler)
 
-            createForm(button)
+            createForm(slotContainer)
         } else { 
             let span = document.createElement("span")
                 span.innerText = "Unavailable"
@@ -90,17 +98,12 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
         resContainer.appendChild(slotContainer)
 
-        resContainer.addEventListener("click", clickHandler)
         
      
     })
 
   }
   
-
-
-
-
   //// event handlers 
 
   function formHandler(e) {
@@ -108,7 +111,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     let object = {
         name: e.target[0].value, 
         slot: e.target.parentNode.querySelector("p").innerText, 
-        date: e.target.parentNode.parentNode.querySelector("h2").innerText
+        date: chosenDate
     }
 
     fetch('http://localhost:3000/reservations', {
@@ -122,18 +125,12 @@ document.addEventListener("DOMContentLoaded", ()=>{
  }
 
   function clickHandler (e) {
-      e.preventDefault()
-
-    console.log(e.target)
-
+    
     if(e.target.innerText === "Reserve") {
         let parent =e.target.parentNode   
         parent.querySelector("#form").style.display = "block"  
     }
 
-    if(e.target.dataset.id === "submit") { 
-        formHandler(e)
-    }
 }
   
 
@@ -170,25 +167,19 @@ document.addEventListener("DOMContentLoaded", ()=>{
 //// Inital fetch to get all exisiting res and save to local array dates 
 
 function getRes () { 
+
     
     fetch("http://localhost:3000/reservations")
 
       .then(resp => resp.json())
       .then( (resp) => {
+
         allRes =resp
         existingRes = filterAll()
-
-    
-
         getDates()
-        // addReservation()
         displayExisting()
         renderTimeSlots()
-        // resp.forEach((resp) => getDates(resp))
-        //   createTimeSlots()
-        //   addReservation()
-        //   displayExisting()
-        //   resp.forEach((resp)=> appendResCard(resp) )
+    
       })
   }
 
