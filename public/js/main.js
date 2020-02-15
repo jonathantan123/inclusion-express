@@ -1,18 +1,26 @@
 // jest won't error out on DOM calls.
-
+// const {getDates} = require('./utils.js')
 
 document.addEventListener("DOMContentLoaded", ()=>{
+
 
     ///hold data to filter through front end 
     let allRes
     let chosenDate 
     let existingRes 
-    let avail = {} /// available reservations 
+    let avail  /// available reservations 
 
     //////
 
     function selectHandler(data, elem) { 
-        chosenDate = new Date(data.date).toISOString().substr(0,10)  
+
+        let date = new Date(data.date).toLocaleString('en-US')
+       
+        
+
+        chosenDate = date.substr(0,9)  
+        
+
         getRes()   
     }
 
@@ -69,7 +77,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   //// Render Available Time Slots
   
   function renderTimeSlots() { 
-      
+
     let resContainer = document.getElementById("reservations-container")
     resContainer.innerHTML = ""
 
@@ -127,7 +135,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
   function clickHandler (e) {
     
     if(e.target.innerText === "Reserve") {
+        e.target.style.display = "none"
         let parent =e.target.parentNode   
+        
         parent.querySelector("#form").style.display = "block"  
     }
 
@@ -137,32 +147,26 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 // helpers 
 
-// /1. Create Object to hold dates of res as keys, and already reserved times in an array as value
-  function getDates() {
-      
-    let slots = ["1:00 PM", "1:30 PM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM", "5:00 PM", "5:30 PM", "6:00 PM", "6:30 PM", "7:00 PM", "7:30 PM", "8:00 PM", "8:30 PM", "9:00 PM"]
-    let totalTables = 10 
-    slots.forEach(slot => avail[slot] = totalTables)
-    
-    existingRes.forEach((resp) => {
-      let time = new Date(resp.slot).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true } )
-      let half 
-      time.includes("30")?  half = `${parseInt(time[0]) + 1}` +  ":00 PM": half = `${time[0]}` + ":30 PM" 
-        if(avail[time]) {   
-            avail[time] -= 1
-                if(avail[half]) {  
-                    avail[half] -= 1
-                }
-            } 
-        })
-    }
-
+  
   ////2. Filter all res to selected date 
 
+
   function filterAll() { 
+      
     return allRes.filter((res) => res.slot.includes(chosenDate))
   }
-  
+
+///// 3. Reformat dates of each resp slot 
+
+  function reFormatDates(resp) {
+       resp.forEach((res) => {
+       return  res.slot = new Date(res.slot).toLocaleString('en-US')
+      } ) 
+      return resp 
+
+  }
+
+
  
 //// Inital fetch to get all exisiting res and save to local array dates 
 
@@ -173,10 +177,11 @@ function getRes () {
 
       .then(resp => resp.json())
       .then( (resp) => {
-
-        allRes =resp
+        
+        allRes =reFormatDates(resp) 
         existingRes = filterAll()
-        getDates()
+        debugger
+        avail = getAvail(existingRes)
         displayExisting()
         renderTimeSlots()
     
